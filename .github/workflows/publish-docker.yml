@@ -16,23 +16,22 @@ jobs:
     # IMPORTANTE: Dale permisos al robot para escribir en tus "Packages"
     permissions:
       contents: read
-     
+      packages: write 
       
+
     steps:
       # 1. El robot "descarga" tu código (app.py, Dockerfile, etc.)
       - name: Checkout repository
         uses: actions/checkout@v3
 
       # 2. El robot "inicia sesión" en el registro de paquetes de GitHub
-      # Nota: Usaremos el username en minúsculas para evitar errores
       - name: Log in to the Container registry
         uses: docker/login-action@v2
         with:
           registry: ghcr.io
-          # Usamos tolower para convertir el nombre de usuario a minúsculas,
-          # ya que GHCR lo requiere.
-          username: ${{ tolower(github.repository_owner) }} 
-          password: ${{ secrets.GITHUB_TOKEN }} 
+          # Esto leerá automáticamente tu nombre de usuario (ej. "jimmy")
+          username: ${{ github.repository_owner }} 
+          password: ${{ secrets.GITHUB_TOKEN }} # Esto es un token mágico que GitHub le da
 
       # 3. El robot construye tu imagen y la sube
       - name: Build and push Docker image
@@ -42,6 +41,5 @@ jobs:
           context: .
           # Le decimos que SÍ la suba (push)
           push: true
-          # **CORRECCIÓN DE ERROR:** El nombre del repositorio DEBE ser en minúsculas.
-          # Usamos la función tolower para asegurar que el nombre de usuario sea válido.
-          tags: ghcr.io/${{ tolower(github.repository_owner) }}/jimmy-app:1.0.1
+
+          tags: ghcr.io/Jimmy0016/jimmy-app:1.0.1"
