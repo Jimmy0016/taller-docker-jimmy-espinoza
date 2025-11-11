@@ -4,7 +4,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def home():
-    return jsonify({"message": "Hola Liz"})
+    return jsonify({"message": "Hola mundo"})
 
 @app.route('/suma/<int:a>/<int:b>')
 def suma(a, b):
