@@ -1,14 +1,15 @@
-from flask import Flask, jsonify
+from flask import Flask
+import os
 
 app = Flask(__name__)
 
-@app.route('/')
-def home():
-    return jsonify({"message": "Hola mundo"})
+# Usamos el puerto 8080 si está definido en las variables de entorno, o 8080 por defecto
+port = int(os.environ.get("PORT", 8080))
 
-@app.route('/suma/<int:a>/<int:b>')
-def suma(a, b):
-    return jsonify({"resultado": a + b})
+@app.route('/')
+def hello_world():
+    return '¡Hola, jimmy espinoza!'
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=3000)
+    # Escuchar en 0.0.0.0 para aceptar conexiones externas
+    app.run(host='0.0.0.0', port=port)
