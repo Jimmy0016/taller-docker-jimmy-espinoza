@@ -16,7 +16,7 @@ jobs:
     # IMPORTANTE: Dale permisos al robot para escribir en tus "Packages"
     permissions:
       contents: read
-      packages: write
+      
 
     steps:
       # 1. El robot "descarga" tu código (app.py, Dockerfile, etc.)
