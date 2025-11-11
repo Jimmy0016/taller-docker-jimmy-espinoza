@@ -1,0 +1,4 @@
+echo "pytest" > requirements.txt
+git add requirements.txt
+git commit -m "Commit 3: agregar archivo requirements.txt con dependencias"
+git push origin jimmy
