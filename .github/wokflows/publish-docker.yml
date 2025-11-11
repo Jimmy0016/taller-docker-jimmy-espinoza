@@ -4,10 +4,10 @@ name: CI/CD - Llinin
 on:
   push:
     branches:
-      - jimmy       # se ejecuta cuando haces push a la rama 'llinin'
+      - espinoza       # se ejecuta cuando haces push a la rama 
   pull_request:
     branches:
-      - jimmy
+      - espinoza
 
 jobs:
   build:
@@ -37,7 +37,7 @@ name: Construir y Publicar Imagen Docker
 on:
   push:
     # Solo cuando se suba código a la rama "vizcaino"
-    branches: [ "jimmy" ]
+    branches: [ "espinoza" ]
 
 # Qué trabajos debe hacer
 jobs:
