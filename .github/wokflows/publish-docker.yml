@@ -1,42 +1,10 @@
-name: CI/CD - Llinin
-
-# 👇 ESTA SECCIÓN ES CLAVE — define el trigger
-on:
-  push:
-    branches:
-      - espinoza       # se ejecuta cuando haces push a la rama 
-  pull_request:
-    branches:
-      - espinoza
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Node.js (example)
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Run build
-        run: npm run build
-
-      - name: List files
-        run: ls -la
-# Nombre de la acción (puedes poner lo que quieras)
-name: Construir y Publicar Imagen Docker
+# Nombre de la acción
+name: Construir y Publicar Imagen (Jimmy)
 
 # Cuándo debe ejecutarse este robot
 on:
   push:
-    # Solo cuando se suba código a la rama "vizcaino"
+    # Solo cuando se suba código a la rama "espinoza"
     branches: [ "espinoza" ]
 
 # Qué trabajos debe hacer
@@ -60,7 +28,8 @@ jobs:
         uses: docker/login-action@v2
         with:
           registry: ghcr.io
-          username: ${{ github.repository_owner }} # Esto es "lalysita"
+          # Esto leerá automáticamente tu nombre de usuario (ej. "jimmy")
+          username: ${{ github.repository_owner }} 
           password: ${{ secrets.GITHUB_TOKEN }} # Esto es un token mágico que GitHub le da
 
       # 3. El robot construye tu imagen y la sube
@@ -71,5 +40,6 @@ jobs:
           context: .
           # Le decimos que SÍ la suba (push)
           push: true
-          # El nombre y la versión EXACTA que te pide tu rúbrica
-          tags: ghcr.io/${{ github.repository_owner }}/jimmyespinoza:1.0.1
+          # El nombre y la versión de tu imagen.
+          # Nota: Cambié "nathalyvizcaino" por "jimmy-app"
+          tags: ghcr.io/${{ github.repository_owner }}/jimmy-app:1.0.1
