@@ -42,4 +42,4 @@ jobs:
           # Le decimos que SÍ la suba (push)
           push: true
 
-          tags: ghcr.io/Jimmy0016/jimmy-app:1.0.1"
+          tags: ghcr.io/Jimmy0016/jimmy-app:1.0.1
