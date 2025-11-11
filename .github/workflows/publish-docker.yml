@@ -42,5 +42,5 @@ jobs:
           # Le decimos que SÍ la suba (push)
           push: true
         
-          tags: ghcr.io/Jimmy0016/taller-docker-jimmy-espinoza:1.0
+          tags: ghcr.io/jimmy0016/taller-docker-jimmy-espinoza:1.0
 
