@@ -1,0 +1,27 @@
+version: "3.8"
+
+services:
+  pgespinoza:
+    image: pgespinoza:1.0.1
+    
+    deploy:
+      replicas: 1
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.pgespinoza.entrypoints=http"
+        - "traefik.http.routers.pgespinoza.rule=Host(`pgespinoza.byronrm.com`)"
+        - "traefik.http.middlewares.pgespinoza-https-redirect.redirectscheme.scheme=https"
+        - "traefik.http.routers.pgespinoza.middlewares=pgespinoza-https-redirect"
+        - "traefik.http.routers.pgespinoza-secure.entrypoints=https"
+        - "traefik.http.routers.pgespinoza-secure.rule=Host(`pgespinoza.byronrm.com`)"
+        - "traefik.http.routers.pgespinoza-secure.tls=true"
+        - "traefik.http.routers.pgespinoza-secure.tls.certresolver=http"
+        - "traefik.http.routers.pgespinoza-secure.service=pgespinoza"
+        - "traefik.http.services.pgespinoza.loadbalancer.server.port=80"
+        - "traefik.docker.network=traefik-public"
+    networks:
+      - traefik-public
+
+networks:
+  traefik-public:
+    external: true
