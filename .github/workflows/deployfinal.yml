@@ -47,7 +47,7 @@ jobs:
 
             cd ~/automatizar
 
-            echo "${{ secrets.GHCR_PAT}} | docker login ghr.io -u jimmy0016 --password-stdin"
+            echo "${{ secrets.GHCR_PAT }} | docker login ghr.io -u jimmy0016 --password-stdin"
 
             docker pull pgespinoza:1.0.1
 
