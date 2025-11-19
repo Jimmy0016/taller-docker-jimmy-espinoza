@@ -5,7 +5,7 @@ services:
     image: pgespinoza:1.0.1
     
     deploy:
-      replicas: 1
+      replicas: 
       labels:
         - "traefik.enable=true"
         - "traefik.http.routers.pgespinoza.entrypoints=http"
