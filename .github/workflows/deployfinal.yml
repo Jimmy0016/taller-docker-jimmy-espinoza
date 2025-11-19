@@ -53,14 +53,14 @@ jobs:
 
             docker stack rm quintob || true 
 
-            sleep 40
+            sleep 30
 
 
 
             docker stack deploy --with-registry-auth -c stack.yml quintob
 
             sleep 30
-            
+
 
             docker ps
 
