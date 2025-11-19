@@ -53,7 +53,7 @@ jobs:
 
             docker stack rm quintob || true 
 
-            sleep 30
+            sleep 40
 
 
 
