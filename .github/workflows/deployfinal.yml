@@ -1,4 +1,4 @@
-name: CI/CD Pipeline - Jimmy Espinoza
+name: CI/CD Pipeline - Jimmy Espinoza (Build & Publish)
 
 on:
   push:
@@ -28,7 +28,7 @@ jobs:
       run: |
         python -m pytest test_app.py -v
 
-  build-and-deploy:
+  build:
     needs: test
     runs-on: ubuntu-latest
     permissions:
@@ -59,68 +59,10 @@ jobs:
         tags: |
           ghcr.io/${{ steps.repo.outputs.name }}:1.0.5
           ghcr.io/${{ steps.repo.outputs.name }}:latest
-
-    - name: 🚀 Deploy to VPS
-      uses: appleboy/ssh-action@master
-      with:
-        host: ${{ secrets.VPS_HOSTNAME }}
-        port: ${{ secrets.VPS_SSH_PORT }}
-        username: ${{ secrets.VPS_USER }}
-        password: ${{ secrets.VPS_PASSWORD }}
-        timeout: 30s
-        command_timeout: 5m
-        use_insecure_cipher: true
-        script: |
-          echo "Iniciando despliegue automático..."
-          
-          # Login a GHCR
-          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-          
-          # Pull de la nueva imagen
-          docker pull ghcr.io/${{ steps.repo.outputs.name }}:1.0.5
-          
-          # Remover stack anterior si existe
-          docker stack rm espinoza-stack || true
-          
-          # Esperar a que se limpie completamente
-          sleep 30
-          
-          # Crear archivo stack.yml temporal
-          cat > /tmp/stack.yml << 'EOF'
-          version: "3.8"
-          
-          services:
-            espinoza-app:
-              image: ghcr.io/${{ steps.repo.outputs.name }}:1.0.5
-              deploy:
-                replicas: 1
-                labels:
-                  - "traefik.enable=true"
-                  - "traefik.http.routers.espinoza.entrypoints=http"
-                  - "traefik.http.routers.espinoza.rule=Host(\`espinoza.byronrm.com\`)"
-                  - "traefik.http.middlewares.espinoza-https-redirect.redirectscheme.scheme=https"
-                  - "traefik.http.routers.espinoza.middlewares=espinoza-https-redirect"
-                  - "traefik.http.routers.espinoza-secure.entrypoints=https"
-                  - "traefik.http.routers.espinoza-secure.rule=Host(\`espinoza.byronrm.com\`)"
-                  - "traefik.http.routers.espinoza-secure.tls=true"
-                  - "traefik.http.routers.espinoza-secure.tls.certresolver=http"
-                  - "traefik.http.routers.espinoza-secure.service=espinoza"
-                  - "traefik.http.services.espinoza.loadbalancer.server.port=80"
-                  - "traefik.docker.network=traefik-public"
-              networks:
-                - traefik-public
-          
-          networks:
-            traefik-public:
-              external: true
-          EOF
-          
-          # Desplegar el nuevo stack
-          docker stack deploy --with-registry-auth -c /tmp/stack.yml espinoza-stack
-          
-          # Verificar despliegue
-          sleep 30
-          docker service ls
-          docker ps
-          
-          echo "Despliegue completado exitosamente"
+    
+    - name: ✅ Build Success
+      run: |
+        echo "✅ CI/CD Pipeline completado exitosamente!"
+        echo "📦 Imagen publicada: ghcr.io/${{ steps.repo.outputs.name }}:1.0.5"
+        echo "🌐 Para despliegue manual, usar: docker stack deploy -c stack.yml espinoza-stack"
+        echo "🔗 Aplicación disponible en: https://espinoza.byronrm.com"
