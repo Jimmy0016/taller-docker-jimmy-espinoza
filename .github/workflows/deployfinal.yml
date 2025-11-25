@@ -47,8 +47,8 @@ jobs:
         context: .
         push: true
         tags: |
-          ghcr.io/${{ github.repository_owner }}/espinoza:1.0.5
-          ghcr.io/${{ github.repository_owner }}/espinoza:latest
+          ghcr.io/jimmy0016/espinoza:1.0.5
+          ghcr.io/jimmy0016/espinoza:latest
 
     - name: 🚀 Deploy to VPS
       uses: appleboy/ssh-action@v1.0.0
@@ -64,7 +64,7 @@ jobs:
           echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
           
           # Pull de la nueva imagen
-          docker pull ghcr.io/${{ github.repository_owner }}/espinoza:1.0.5
+          docker pull ghcr.io/jimmy0016/espinoza:1.0.5
           
           # Remover stack anterior si existe
           docker stack rm espinoza-stack || true
@@ -78,7 +78,7 @@ jobs:
           
           services:
             espinoza-app:
-              image: ghcr.io/${{ github.repository_owner }}/espinoza:1.0.5
+              image: ghcr.io/jimmy0016/espinoza:1.0.5
               deploy:
                 replicas: 1
                 labels:
