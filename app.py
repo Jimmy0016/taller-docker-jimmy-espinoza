@@ -20,7 +20,7 @@ AI_RESPONSES = [
 @app.route('/')
 def hello_world():
     return '''
-    <h1>¡Hola, Jimmy Espinoza!</h1>
+    <h1>¡este es mi examen final </h1>
     <p>Aplicación Flask con IA - Versión 1.0.5</p>
     <p>Endpoints disponibles:</p>
     <ul>
