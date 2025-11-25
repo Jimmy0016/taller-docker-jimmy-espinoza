@@ -1,24 +1,23 @@
 FROM python:3.10-slim
 
-
+# Establecer directorio de trabajo
 WORKDIR /app
 
-
+# Copiar requirements primero para aprovechar cache de Docker
 COPY requirements.txt .
 
-# Instala las dependencias
+# Instalar dependencias
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Copiar código de la aplicación
+COPY app.py .
 
-COPY . .
+# Exponer puerto 80
+EXPOSE 80
 
-# -----------------------------------------------------------------
-# 5. EXPONE EL PUERTO (si es necesario)
-# Informa a Docker que el contenedor escuchará en el puerto 8080.
-# Esto es más bien "documentación" para el usuario y para Docker.
-EXPOSE 8080
+# Crear usuario no-root para seguridad
+RUN adduser --disabled-password --gecos '' appuser && chown -R appuser /app
+USER appuser
 
-# -----------------------------------------------------------------
-# 6. EJECUTA LA APLICACIÓN
-# El comando para iniciar la aplicación cuando se lance el contenedor.
+# Comando para ejecutar la aplicación
 CMD ["python", "app.py"]

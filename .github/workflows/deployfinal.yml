@@ -1,26 +1,38 @@
-# This workflow will install Python dependencies, run tests and lint with a single version of Python
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
-
-name: Despliegue de Hola mundo
+name: CI/CD Pipeline - Jimmy Espinoza
 
 on:
   push:
     branches: "espinoza"
 
 permissions:
-    contents: read
-    packages: write
+  contents: read
+  packages: write
+
 jobs:
-  build:
-
+  test:
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v4
+    
     - name: Set up Python 3.10
-      uses: actions/setup-python@v3
+      uses: actions/setup-python@v4
       with:
-        python-version: "3.11"
+        python-version: "3.10"
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Run tests
+      run: |
+        python -m pytest test_app.py -v
+
+  build-and-deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
     
     - name: 🔐 Login to GitHub Container Registry
       uses: docker/login-action@v3
@@ -30,37 +42,72 @@ jobs:
         password: ${{ secrets.GITHUB_TOKEN }}
 
     - name: 🏗️ Build and push Docker image
-      uses: docker/build-push-action@v6
+      uses: docker/build-push-action@v5
       with:
+        context: .
         push: true
-        tags: pgespinoza:1.0.1
+        tags: |
+          ghcr.io/${{ github.repository_owner }}/espinoza:1.0.5
+          ghcr.io/${{ github.repository_owner }}/espinoza:latest
 
-    - name: Pasar el stack.yml al servidor
-      uses: appleboy/scp-action@v1
+    - name: 🚀 Deploy to VPS
+      uses: appleboy/ssh-action@v1.0.0
       with:
         host: ${{ secrets.VPS_HOSTNAME }}
         port: ${{ secrets.VPS_SSH_PORT }}
         username: ${{ secrets.VPS_USER }}
         password: ${{ secrets.VPS_PASSWORD }}
         script: |
-            echo "Deployando los servicios"
-
-            cd ~/automatizar
-
-            echo "${{ secrets.GHCR_PAT }} | docker login ghr.io -u jimmy0016 --password-stdin"
-
-            docker pull pgespinoza:1.0.1
-
-            docker stack rm quintob || true 
-
-            sleep 30
-
-
-
-            docker stack deploy --with-registry-auth -c stack.yml quintob
-
-            sleep 30
-
-
-            docker ps
-
+          echo "Iniciando despliegue automático..."
+          
+          # Login a GHCR
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+          
+          # Pull de la nueva imagen
+          docker pull ghcr.io/${{ github.repository_owner }}/espinoza:1.0.5
+          
+          # Remover stack anterior si existe
+          docker stack rm espinoza-stack || true
+          
+          # Esperar a que se limpie completamente
+          sleep 30
+          
+          # Crear archivo stack.yml temporal
+          cat > /tmp/stack.yml << 'EOF'
+          version: "3.8"
+          
+          services:
+            espinoza-app:
+              image: ghcr.io/${{ github.repository_owner }}/espinoza:1.0.5
+              deploy:
+                replicas: 1
+                labels:
+                  - "traefik.enable=true"
+                  - "traefik.http.routers.espinoza.entrypoints=http"
+                  - "traefik.http.routers.espinoza.rule=Host(\`espinoza.byronrm.com\`)"
+                  - "traefik.http.middlewares.espinoza-https-redirect.redirectscheme.scheme=https"
+                  - "traefik.http.routers.espinoza.middlewares=espinoza-https-redirect"
+                  - "traefik.http.routers.espinoza-secure.entrypoints=https"
+                  - "traefik.http.routers.espinoza-secure.rule=Host(\`espinoza.byronrm.com\`)"
+                  - "traefik.http.routers.espinoza-secure.tls=true"
+                  - "traefik.http.routers.espinoza-secure.tls.certresolver=http"
+                  - "traefik.http.routers.espinoza-secure.service=espinoza"
+                  - "traefik.http.services.espinoza.loadbalancer.server.port=80"
+                  - "traefik.docker.network=traefik-public"
+              networks:
+                - traefik-public
+          
+          networks:
+            traefik-public:
+              external: true
+          EOF
+          
+          # Desplegar el nuevo stack
+          docker stack deploy --with-registry-auth -c /tmp/stack.yml espinoza-stack
+          
+          # Verificar despliegue
+          sleep 30
+          docker service ls
+          docker ps
+          
+          echo "Despliegue completado exitosamente"

@@ -1,162 +1,221 @@
 # Taller Docker - Jimmy Espinoza
 
-Una aplicación web simple desarrollada con Flask y containerizada con Docker, configurada para despliegue con Docker Swarm y Traefik.
+Una aplicación web Flask con IA integrada, containerizada con Docker y configurada para CI/CD completo con GitHub Actions y despliegue automático.
 
-##  Descripción
+## 🚀 Descripción
 
-Esta es una aplicación web básica que muestra un mensaje de saludo personalizado. El proyecto incluye configuración completa para containerización, despliegue automatizado y CI/CD.
+Aplicación Flask con funcionalidad de IA simulada que demuestra un pipeline completo de CI/CD, incluyendo:
+- Tests automatizados
+- Construcción y publicación de imágenes en GitHub Container Registry (GHCR)
+- Despliegue automático en VPS con Docker Swarm
+- Configuración de Traefik para proxy reverso y SSL
 
-##  Características
+## ✨ Características
 
-- Aplicación Flask minimalista
-- Containerización con Docker
-- Despliegue con Docker Swarm
-- Configuración de Traefik para proxy reverso
-- CI/CD con GitHub Actions
-- Makefile para automatización de tareas
+- **Aplicación Flask con IA**: Endpoints que simulan respuestas de inteligencia artificial
+- **Tests automatizados**: Suite completa de pruebas con pytest
+- **CI/CD Pipeline**: GitHub Actions para integración y despliegue continuo
+- **Containerización**: Docker optimizado con mejores prácticas
+- **Despliegue automático**: Docker Swarm con Traefik
+- **SSL automático**: Certificados Let's Encrypt via Traefik
 
-## Tecnologías
+## 🛠 Tecnologías
 
 - **Python 3.10**
 - **Flask 3.1.2**
-- **Docker**
-- **Docker Swarm**
-- **Traefik**
+- **Docker & Docker Swarm**
+- **GitHub Container Registry (GHCR)**
 - **GitHub Actions**
+- **Traefik**
+- **pytest**
 
-##  Estructura del Proyecto
+## 📁 Estructura del Proyecto
 
 ```
 taller-docker-jimmy-espinoza/
 ├── .github/
 │   └── workflows/
-│       └── publish-docker.yml    # CI/CD pipeline
-├── app.py                        # Aplicación Flask
-├── Dockerfile                    # Configuración del contenedor
-├── requirements.txt              # Dependencias de Python
-├── Makefile                      # Comandos automatizados
-├── stack.yml                     # Configuración Docker Swarm
-├── .dockerignore                 # Archivos ignorados por Docker
-└── .gitignore                    # Archivos ignorados por Git
+│       └── deployfinal.yml      # Pipeline CI/CD
+├── app.py                       # Aplicación Flask con IA
+├── test_app.py                  # Tests automatizados
+├── Dockerfile                   # Configuración optimizada del contenedor
+├── requirements.txt             # Dependencias Python + testing
+├── Makefile                     # Comandos automatizados
+├── stack.yml                    # Configuración Docker Swarm
+├── pytest.ini                  # Configuración de tests
+├── .dockerignore               # Archivos ignorados por Docker
+└── README.md                   # Documentación
 ```
 
-## Instalación y Uso
+## 🌐 Endpoints de la API
+
+| Endpoint | Método | Descripción |
+|----------|--------|-------------|
+| `/`      | GET    | Página principal con información |
+| `/ai`    | GET    | Consulta a la IA simulada |
+| `/health`| GET    | Estado de salud de la aplicación |
+| `/info`  | GET    | Información del sistema |
+
+## 🚀 Instalación y Uso
 
 ### Prerrequisitos
 
 - Docker
-- Docker Compose
 - Make (opcional)
+- Python 3.10+ (para desarrollo local)
 
-### Ejecución Local
+### Desarrollo Local
 
 1. **Clonar el repositorio:**
    ```bash
    git clone <repository-url>
    cd taller-docker-jimmy-espinoza
+   git checkout espinoza
    ```
 
-2. **Construir la imagen Docker:**
+2. **Instalar dependencias:**
    ```bash
-   docker build -t pgespinoza:1.0.1 .
+   pip install -r requirements.txt
    ```
 
-3. **Ejecutar el contenedor:**
+3. **Ejecutar tests:**
    ```bash
-   docker run -p 8080:80 pgespinoza:1.0.1
+   make test
+   # o
+   python -m pytest test_app.py -v
    ```
 
-4. **Acceder a la aplicación:**
-   Abrir http://localhost:8080 en el navegador
+4. **Construir y ejecutar con Docker:**
+   ```bash
+   make build
+   make run
+   # o
+   docker build -t ghcr.io/jimmy0016/espinoza:1.0.5 .
+   docker run -p 8080:80 ghcr.io/jimmy0016/espinoza:1.0.5
+   ```
 
-### Usando Makefile
+5. **Acceder a la aplicación:**
+   - Local: http://localhost:8080
+   - Producción: https://espinoza.byronrm.com
+
+### Comandos Make Disponibles
 
 ```bash
-# Construir la imagen
-make build
-
-# Desplegar en Docker Swarm
-make deploy
-
-# Ver logs
-make logs
-
-# Ver servicios activos
-make ps
-
-# Reiniciar completamente
-make restart
-
-# Remover el stack
-make rm
+make test      # Ejecutar tests
+make build     # Construir imagen Docker
+make run       # Ejecutar contenedor localmente
+make deploy    # Desplegar en Docker Swarm
+make logs      # Ver logs del servicio
+make ps        # Ver servicios activos
+make restart   # Reiniciar completamente
+make rm        # Remover stack
 ```
 
-##  Docker
+## 🔄 CI/CD Pipeline
 
-### Dockerfile
+### Flujo Automatizado
 
-La imagen se basa en `python:3.10-slim` e incluye:
-- Instalación de dependencias desde `requirements.txt`
-- Exposición del puerto 8080
-- Comando de inicio automático
+1. **Push a rama `espinoza`** → Trigger del pipeline
+2. **Tests**: Ejecución de pytest
+3. **Build**: Construcción de imagen Docker
+4. **Publish**: Publicación en GHCR como `ghcr.io/jimmy0016/espinoza:1.0.5`
+5. **Deploy**: Despliegue automático en VPS
+
+### Configuración del Pipeline
+
+- **Tests**: pytest con cobertura completa
+- **Registry**: GitHub Container Registry (GHCR)
+- **Imagen**: `ghcr.io/jimmy0016/espinoza:1.0.5`
+- **Despliegue**: Docker Swarm automático
+- **SSL**: Certificados automáticos via Traefik
+
+## 🐳 Docker
+
+### Imagen Optimizada
+
+- Base: `python:3.10-slim`
+- Usuario no-root para seguridad
+- Cache optimizado de dependencias
+- Tamaño mínimo de imagen
 
 ### Docker Swarm
 
-El archivo `stack.yml` configura:
+Configuración en `stack.yml`:
 - 1 réplica del servicio
-- Integración con Traefik para proxy reverso
-- Configuración SSL automática
-- Red externa `traefik-public`
+- Integración completa con Traefik
+- Red `traefik-public`
+- SSL automático
 
-##  Despliegue
+## 🌍 Despliegue en Producción
 
-### Configuración de Traefik
+### Dominio y SSL
 
-El servicio está configurado para:
-- **Dominio:** `pgespinoza.byronrm.com`
-- **Redirección HTTPS automática**
-- **Certificados SSL automáticos**
-- **Puerto interno:** 80
+- **URL**: https://espinoza.byronrm.com
+- **SSL**: Certificados automáticos Let's Encrypt
+- **Proxy**: Traefik con redirección HTTPS
 
-### CI/CD
+### Monitoreo
 
-GitHub Actions automatiza:
-- Construcción de la imagen Docker
-- Publicación en registry
-- Despliegue automático
+```bash
+# Ver servicios
+docker service ls
 
-##  API Endpoints
+# Ver logs en tiempo real
+docker service logs -f espinoza-stack_espinoza-app
 
-| Endpoint | Método | Descripción |
-|----------|--------|-------------|
-| `/`      | GET    | Mensaje de saludo |
+# Estado de contenedores
+docker ps
+```
 
-##  Configuración
+## 🧪 Testing
 
-### Variables de Entorno
+### Suite de Pruebas
 
-- `PORT`: Puerto de la aplicación (default: 8080)
+- Tests de endpoints principales
+- Validación de respuestas JSON
+- Verificación de códigos de estado
+- Tests de funcionalidad de IA
 
-### Dependencias
+### Ejecutar Tests
 
-Ver `requirements.txt` para la lista completa de dependencias de Python.
+```bash
+# Con make
+make test
+
+# Directamente con pytest
+python -m pytest test_app.py -v
+
+# Con cobertura
+python -m pytest test_app.py --cov=app
+```
+
+## 📊 Versioning
+
+- **Versión actual**: 1.0.5
+- **Rama de desarrollo**: espinoza
+- **Registry**: GitHub Container Registry (GHCR)
 
 ## 🤝 Contribución
 
 1. Fork el proyecto
-2. Crear una rama para tu feature (`git checkout -b feature/AmazingFeature`)
-3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
-4. Push a la rama (`git push origin feature/AmazingFeature`)
-5. Abrir un Pull Request
+2. Crear rama desde `espinoza`
+3. Realizar cambios y tests
+4. Push activará CI/CD automático
+5. Verificar despliegue en https://espinoza.byronrm.com
 
-##  Licencia
+## 📝 Licencia
 
-Este proyecto es parte de un taller educativo sobre Docker.
+Proyecto educativo para examen de CI/CD - Jimmy Espinoza
 
-##  Autor
+## 👨‍💻 Autor
 
 **Jimmy Espinoza**
+- Proyecto: Examen CI/CD
+- Rama: espinoza
+- Dominio: espinoza.byronrm.com
 
 ---
 
-Si este proyecto te fue útil, ¡no olvides darle una estrella!
+🌟 **Pipeline Status**: [![CI/CD](https://github.com/jimmy0016/taller-docker-jimmy-espinoza/actions/workflows/deployfinal.yml/badge.svg?branch=espinoza)](https://github.com/jimmy0016/taller-docker-jimmy-espinoza/actions/workflows/deployfinal.yml)
+
+🚀 **Live Demo**: [https://espinoza.byronrm.com](https://espinoza.byronrm.com)
