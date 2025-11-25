@@ -13,7 +13,7 @@ class FlaskAppTestCase(unittest.TestCase):
         """Test del endpoint principal"""
         response = self.app.get('/')
         self.assertEqual(response.status_code, 200)
-        self.assertIn(b'este es mi examen final', response.data)
+        self.assertIn(b'Este es mi examen final', response.data)
         self.assertIn(b'1.0.5', response.data)
 
     def test_ai_endpoint(self):
